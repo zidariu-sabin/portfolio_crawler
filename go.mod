@@ -1,4 +1,4 @@
-module github_webcrawler
+module portfolio_crawler
 
 go 1.24.4
 

@@ -1,5 +1,26 @@
 [
   {
+    "name": "portfolio_crawler",
+    "description": "",
+    "url": "https://github.com/zidariu-sabin/portfolio_crawler",
+    "updatedAt": "2025-10-14T16:10:04Z",
+    "languages": {
+      "Nodes": [
+        {
+          "name": "Shell",
+          "color": "#89e051"
+        },
+        {
+          "name": "Go",
+          "color": "#00ADD8"
+        }
+      ]
+    },
+    "object": {
+      "abbreviatedOId": ""
+    }
+  },
+  {
     "name": "Obsidian-vault",
     "description": "",
     "url": "https://github.com/zidariu-sabin/Obsidian-vault",
@@ -59,35 +80,6 @@
     },
     "object": {
       "abbreviatedOId": "0ffebcc"
-    }
-  },
-  {
-    "name": "learn-file-storage-s3-golang-starter",
-    "description": "",
-    "url": "https://github.com/zidariu-sabin/learn-file-storage-s3-golang-starter",
-    "updatedAt": "2025-10-05T16:36:18Z",
-    "languages": {
-      "Nodes": [
-        {
-          "name": "Shell",
-          "color": "#89e051"
-        },
-        {
-          "name": "JavaScript",
-          "color": "#f1e05a"
-        },
-        {
-          "name": "Go",
-          "color": "#00ADD8"
-        },
-        {
-          "name": "CSS",
-          "color": "#663399"
-        }
-      ]
-    },
-    "object": {
-      "abbreviatedOId": "34d955b"
     }
   }
 ]

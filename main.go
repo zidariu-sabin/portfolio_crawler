@@ -9,7 +9,7 @@ import (
 	"log"
 	"net/http"
 	"os"
-	"os/exec"
+	"portfolio_crawler/utils"
 
 	"github.com/joho/godotenv"
 )
@@ -31,10 +31,13 @@ type Response struct {
 					Url         string `json:"url"`
 					UpdatedAt   string `json:"updatedAt"`
 					Languages   struct {
-						Nodes []struct {
-							Name  string `json:"name"`
-							Color string `json:"color"`
-						}
+						Edges []struct {
+							Node struct {
+								Name  string `json:"name"`
+								Color string `json:"color"`
+							} `json:"node"`
+							Size int `json:"size"`
+						} `json:"edges"`
 					} `json:"languages"`
 					Object struct {
 						AbreviatedOid string `json:"abbreviatedOId"`
@@ -45,7 +48,7 @@ type Response struct {
 	} `json:"data"`
 }
 
-func fetchRepos(user string, token string) ([]byte, []string, error) {
+func fetchRepos(user string, token string) ([]byte, map[string]string, error) {
 	//create gql query to gather data on repository and load data from the resourcePath with /blob/
 
 	query := `query($login: String!){
@@ -57,9 +60,12 @@ func fetchRepos(user string, token string) ([]byte, []string, error) {
 					url
 					updatedAt
 					languages(first:4){
-						nodes{
+						edges{
+             			node{
 							name
 							color
+						}
+						size
 						}
 					}
 					object(expression: "main:README.md") {
@@ -110,12 +116,16 @@ func fetchRepos(user string, token string) ([]byte, []string, error) {
 
 	// fmt.Println(data)
 	//return the rawgithubcontent api for the readMeFiles to download
-	var readMeFiles []string
+	var readMeFileLinks = make(map[string]string)
 	for _, repo := range data.Data.User.Repositories.Nodes {
-		readMeFiles = append(readMeFiles, fmt.Sprintf("https://raw.githubusercontent.com/%v/%v/main/README.md", user, repo.Name))
+		if repo.Object.AbreviatedOid == "" {
+			continue
+		}
+		// readMeFiles = append(readMeFiles, fmt.Sprintf("https://raw.githubusercontent.com/%v/%v/main/README.md", user, repo.Name))
+		readMeFileLinks[repo.Name] = fmt.Sprintf("https://raw.githubusercontent.com/%v/%v/main/README.md", user, repo.Name)
 	}
 	jsonOutput, _ := json.MarshalIndent(data.Data.User.Repositories.Nodes, "", "  ")
-	return jsonOutput, readMeFiles, nil
+	return jsonOutput, readMeFileLinks, nil
 }
 
 //execute shell script to download files to folder
@@ -124,6 +134,7 @@ func main() {
 	godotenv.Load(".env")
 	token := os.Getenv("GITHUB_AUTH_TOKEN")
 	username := os.Getenv("GITHUB_USERNAME")
+	destFile := os.Getenv("DESTINATION_FOLDER_PATH")
 	if token == "" {
 		log.Fatal("please provide a GitHub API token via env variable GITHUB_AUTH_TOKEN")
 	}
@@ -131,51 +142,13 @@ func main() {
 		log.Fatal("please provide a GitHub Username via env variable GITHUB_USERNAME")
 	}
 
-	repos, readMeFiles, err := fetchRepos(username, token)
+	repos, readMeFileLinks, err := fetchRepos(username, token)
 
 	if err != nil {
 		log.Fatalf("Error: %v", err)
 	}
 
-	// Run the shell script and pass the readme URLs as individual arguments.
-	// We use slice expansion (readMeFiles...) to pass []string as variadic args.
-	// Note: this expects a POSIX shell (sh) to be available. On Windows you may
-	// need to run this under Git Bash / WSL or change to a Windows-compatible script.
-
-	// Build the args slice: the first arg to the shell is the script path,
-	// followed by the list of README URLs.
-	// Then expand the whole args slice once into exec.Command's variadic parameter.
-	args := append([]string{"./echoStrings"}, readMeFiles...)
-	for i := range args {
-		fmt.Println(args[i])
-	}
-
-	// Try to find a POSIX shell in PATH (bash preferred, then sh).
-	// On Windows `sh` may not exist even if curl.exe is available; curl is a native
-	// binary in PATH but shells like bash are provided by Git for Windows or WSL.
-	var cmd *exec.Cmd
-	shellCandidates := []string{"bash", "sh"}
-	var shellPath string
-	for _, s := range shellCandidates {
-		if p, err := exec.LookPath(s); err == nil {
-			shellPath = p
-			break
-		}
-	}
-	fmt.Println(shellPath)
-	if shellPath != "" {
-		cmd = exec.Command(shellPath, args...)
-	} else {
-		log.Println("no POSIX shell (bash/sh) found in PATH. If you want to run shell scripts on Windows, install Git for Windows (add Git Bash to PATH) or use WSL. Attempting to execute the script directly...")
-		cmd = exec.Command("./echoStrings", readMeFiles...)
-	}
-
-	out, err := cmd.CombinedOutput()
-	if err != nil {
-		log.Printf("script execution failed: %v\noutput: %s", err, string(out))
-	} else {
-		fmt.Printf("script output: %s\n", string(out))
-	}
+	utils.DownloadMany(readMeFileLinks, 3, destFile)
 
 	f, err := os.Create("repos.json")
 

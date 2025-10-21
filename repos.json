@@ -1,32 +1,11 @@
 [
   {
-    "name": "portfolio_crawler",
-    "description": "",
-    "url": "https://github.com/zidariu-sabin/portfolio_crawler",
-    "updatedAt": "2025-10-14T16:10:04Z",
-    "languages": {
-      "Nodes": [
-        {
-          "name": "Shell",
-          "color": "#89e051"
-        },
-        {
-          "name": "Go",
-          "color": "#00ADD8"
-        }
-      ]
-    },
-    "object": {
-      "abbreviatedOId": ""
-    }
-  },
-  {
     "name": "Obsidian-vault",
     "description": "",
     "url": "https://github.com/zidariu-sabin/Obsidian-vault",
-    "updatedAt": "2025-10-14T10:54:35Z",
+    "updatedAt": "2025-10-21T18:00:30Z",
     "languages": {
-      "Nodes": []
+      "edges": []
     },
     "object": {
       "abbreviatedOId": ""
@@ -36,24 +15,36 @@
     "name": "nuxt_portfolio",
     "description": "A nuxt portfolio and blog app with markdown parsing and code highlighting built using nuxt. This project is also deployed on nuxt hub : https://nuxt-portfolio-zidariu-sabin.nuxt.dev/ ",
     "url": "https://github.com/zidariu-sabin/nuxt_portfolio",
-    "updatedAt": "2025-10-09T08:07:47Z",
+    "updatedAt": "2025-10-16T16:20:36Z",
     "languages": {
-      "Nodes": [
+      "edges": [
         {
-          "name": "Vue",
-          "color": "#41b883"
+          "node": {
+            "name": "Vue",
+            "color": "#41b883"
+          },
+          "size": 16259
         },
         {
-          "name": "CSS",
-          "color": "#663399"
+          "node": {
+            "name": "CSS",
+            "color": "#663399"
+          },
+          "size": 1213
         },
         {
-          "name": "TypeScript",
-          "color": "#3178c6"
+          "node": {
+            "name": "TypeScript",
+            "color": "#3178c6"
+          },
+          "size": 1454
         },
         {
-          "name": "JavaScript",
-          "color": "#f1e05a"
+          "node": {
+            "name": "JavaScript",
+            "color": "#f1e05a"
+          },
+          "size": 162
         }
       ]
     },
@@ -62,19 +53,52 @@
     }
   },
   {
+    "name": "portfolio_crawler",
+    "description": "",
+    "url": "https://github.com/zidariu-sabin/portfolio_crawler",
+    "updatedAt": "2025-10-15T10:15:02Z",
+    "languages": {
+      "edges": [
+        {
+          "node": {
+            "name": "Shell",
+            "color": "#89e051"
+          },
+          "size": 312
+        },
+        {
+          "node": {
+            "name": "Go",
+            "color": "#00ADD8"
+          },
+          "size": 5620
+        }
+      ]
+    },
+    "object": {
+      "abbreviatedOId": ""
+    }
+  },
+  {
     "name": "kata-machine-practice",
     "description": "A repository to practice data structures and algoritms following ThePrimeagen's \"The last algorithms course you need\" from Frontend Masters",
     "url": "https://github.com/zidariu-sabin/kata-machine-practice",
     "updatedAt": "2025-10-06T13:38:25Z",
     "languages": {
-      "Nodes": [
+      "edges": [
         {
-          "name": "TypeScript",
-          "color": "#3178c6"
+          "node": {
+            "name": "TypeScript",
+            "color": "#3178c6"
+          },
+          "size": 42897
         },
         {
-          "name": "JavaScript",
-          "color": "#f1e05a"
+          "node": {
+            "name": "JavaScript",
+            "color": "#f1e05a"
+          },
+          "size": 11900
         }
       ]
     },

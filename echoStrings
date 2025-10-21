@@ -1,4 +1,0 @@
-#!/bin/sh
-images=$1
-# iterate over all passed args and print each one
-echo "Downloaded $images"

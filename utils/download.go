@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"portfolio_crawler/globals"
 	"strings"
 	"sync"
 	"time"
@@ -50,7 +51,13 @@ func ValidateDest(dest string) (string, error) {
 	return finalDest, nil
 }
 
-func DownloadFile(url, name string) error {
+func CreateMetaData(name string) ([]byte, error) {
+	//have to find a way to link the meta data to the specific file details
+	//use reflect library to on how to dynamically acess types defiend in the metaData stuct
+	//ReposMetaData
+}
+
+func DownloadFile(url, newFilePath string, fileName string) error {
 
 	//request timeout after 10 seconds
 	client := &http.Client{Timeout: 10 * time.Second}
@@ -71,7 +78,7 @@ func DownloadFile(url, name string) error {
 	}
 
 	//create the file
-	out, err := os.Create(name)
+	out, err := os.Create(newFilePath)
 	if err != nil {
 		return fmt.Errorf("creating file: %w", err)
 	}
@@ -87,25 +94,21 @@ func DownloadFile(url, name string) error {
 
 // DownloadMany downloads multiple files concurrently.
 // Retries each failed download up to `retries` times.
-func DownloadMany(urls map[string]string, retries int, dest string) error {
-
-	dest, err := ValidateDest(dest)
-	if err != nil {
-		return err
-	}
+func DownloadMany(urls map[string]string, retries int) error {
 
 	var wg sync.WaitGroup
 	sem := make(chan struct{}, 5) // limit concurrency to 5
 
 	for name, url := range urls {
 		wg.Add(1)
+		dest := globals.DestinationDir + "/" + name + ".md"
 		go func(url, dest string) {
 			defer wg.Done()
 			sem <- struct{}{} // acquire slot
 			defer func() { <-sem }()
 
 			for attempt := 1; attempt <= retries; attempt++ {
-				err = DownloadFile(url, dest+"/"+name+".md")
+				err := DownloadFile(url, dest, name)
 				if err != nil {
 					fmt.Printf("Error: (%d/%d) Failed to download %s: %v. Retrying...\n", attempt, retries, url, err)
 					time.Sleep(2 * time.Second)
@@ -120,8 +123,5 @@ func DownloadMany(urls map[string]string, retries int, dest string) error {
 
 	wg.Wait()
 
-	if err != nil {
-		return err
-	}
 	return nil
 }

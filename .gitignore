@@ -1,4 +1,5 @@
 .env
 repos.json
+repos.yaml
 test/
 samples/

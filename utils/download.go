@@ -10,6 +10,8 @@ import (
 	"strings"
 	"sync"
 	"time"
+
+	yaml "github.com/goccy/go-yaml"
 )
 
 // ValidateDest checks that the destination path's directory exists and is writable.
@@ -54,7 +56,20 @@ func ValidateDest(dest string) (string, error) {
 func CreateMetaData(name string) ([]byte, error) {
 	//have to find a way to link the meta data to the specific file details
 	//use reflect library to on how to dynamically acess types defiend in the metaData stuct
-	//ReposMetaData
+	//ReposMetaData mm
+	y := []byte("---\n")
+	metaDataYaml, err := yaml.Marshal(globals.ReposMetaData[name])
+
+	if err != nil {
+		return nil, err
+	}
+
+	y = append(y, metaDataYaml...)
+	y = append(y, []byte("---\n")...)
+
+	WriteYaml(y)
+	return y, nil
+
 }
 
 func DownloadFile(url, newFilePath string, fileName string) error {
@@ -84,7 +99,20 @@ func DownloadFile(url, newFilePath string, fileName string) error {
 	}
 	defer out.Close()
 
+	metaData, err := CreateMetaData(fileName)
+	if err != nil {
+		return fmt.Errorf("creating meta data: %w", err)
+	}
+
+	_, err = out.Write(metaData)
+	if err != nil {
+		return fmt.Errorf("writing meta data: %w", err)
+	}
 	_, err = io.Copy(out, resp.Body)
+
+	if err != nil {
+		return fmt.Errorf("writing markdown content data: %w", err)
+	}
 
 	//
 	//should add meta data of the file and create a new one

@@ -87,7 +87,7 @@ func fetchRepos(user string, token string) (map[string]string, error) {
 		if repo.Object.AbreviatedOid == "" {
 			continue
 		}
-		langs := make([]globals.LanguageData, 4)
+		langs := make([]globals.LanguageData, 0)
 
 		for _, lang := range repo.Languages.Edges {
 			langs = append(langs, globals.LanguageData{
@@ -109,7 +109,7 @@ func fetchRepos(user string, token string) (map[string]string, error) {
 	}
 
 	globals.ReposData = &data
-	globals.ReposMetaData = &reposMetaData
+	globals.ReposMetaData = reposMetaData
 
 	return readMeFileLinks, nil
 }
@@ -134,10 +134,15 @@ func main() {
 		log.Fatalf("Error: %v", err)
 	}
 	globals.DestinationDir = desiredDir
+	// globals.ReposMetaData = make(map[string]globals.RepoMetaData)
 
 	readMeFileLinks, err := fetchRepos(username, token)
 
-	reposJsonOutput, _ := json.MarshalIndent(globals.ReposData.Data.User.Repositories.Nodes, "", "  ")
+	if err != nil {
+		log.Fatalf("Error: %v", err)
+	}
+
+	reposJsonOutput, err := json.MarshalIndent(globals.ReposData.Data.User.Repositories.Nodes, "", "  ")
 
 	if err != nil {
 		log.Fatalf("Error: %v", err)
@@ -145,19 +150,13 @@ func main() {
 
 	utils.DownloadMany(readMeFileLinks, 3)
 
-	f, err := os.Create("repos.json")
+	utils.WriteJson(reposJsonOutput)
 
 	if err != nil {
 		log.Fatalf("Error: %v", err)
 	}
-	defer f.Close()
 
-	_, err = f.Write(reposJsonOutput)
-
-	if err != nil {
-		defer f.Close()
-		log.Fatalf("Error: %v", err)
-	}
-	// fmt.Printf("List of repositories: %v", repos)
+	// utils.WriteYaml(globals.ReposMetaData)
+	// fmt.Printf("List of metadata: %v", globals.ReposMetaData)
 
 }

@@ -34,21 +34,21 @@ type Response struct {
 
 // check if frontend can support object like syntax in markdown metaData
 type LanguageData struct {
-	Name  string
-	Color string
-	Size  int
+	Name  string `yaml:"name"`
+	Color string `yaml:"color"`
+	Size  int    `yaml:"size"`
 }
 
 type RepoMetaData struct {
-	Description string
-	Url         string
-	UpdatedAt   string
-	Languages   []LanguageData
-	ReadMeOid   string
+	Description string         `yaml:"description"`
+	Url         string         `yaml:"url"`
+	UpdatedAt   string         `yaml:"updatedAt"`
+	Languages   []LanguageData `yaml:"languages"`
+	ReadMeOid   string         `yaml:"readMeOid"`
 }
 
 var (
-	ReposData      *Response //might end up deleting
-	ReposMetaData  *map[string]RepoMetaData
+	ReposData      *Response               //might end up deleting
+	ReposMetaData  map[string]RepoMetaData // map of repos with name as key
 	DestinationDir string
 )

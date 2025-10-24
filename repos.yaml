@@ -1,0 +1,19 @@
+---
+description: "A nuxt portfolio and blog app with markdown parsing and code highlighting built using nuxt. This project is also deployed on nuxt hub : https://nuxt-portfolio-zidariu-sabin.nuxt.dev/ "
+url: https://github.com/zidariu-sabin/nuxt_portfolio
+updatedAt: "2025-10-21T19:53:29Z"
+languages:
+- name: Vue
+  color: "#41b883"
+  size: 17440
+- name: CSS
+  color: "#663399"
+  size: 1213
+- name: TypeScript
+  color: "#3178c6"
+  size: 1628
+- name: JavaScript
+  color: "#f1e05a"
+  size: 162
+readMeOid: be8cb9e
+---

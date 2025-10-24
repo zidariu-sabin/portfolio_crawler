@@ -53,10 +53,8 @@ func ValidateDest(dest string) (string, error) {
 	return finalDest, nil
 }
 
-func CreateMetaData(name string) ([]byte, error) {
-	//have to find a way to link the meta data to the specific file details
-	//use reflect library to on how to dynamically acess types defiend in the metaData stuct
-	//ReposMetaData mm
+// parsing repo meta data to yaml format
+func GenerateMetaData(name string) ([]byte, error) {
 	y := []byte("---\n")
 	metaDataYaml, err := yaml.Marshal(globals.ReposMetaData[name])
 
@@ -99,7 +97,8 @@ func DownloadFile(url, newFilePath string, fileName string) error {
 	}
 	defer out.Close()
 
-	metaData, err := CreateMetaData(fileName)
+	//generating yaml meta data for the markdown file
+	metaData, err := GenerateMetaData(fileName)
 	if err != nil {
 		return fmt.Errorf("creating meta data: %w", err)
 	}
@@ -114,9 +113,6 @@ func DownloadFile(url, newFilePath string, fileName string) error {
 		return fmt.Errorf("writing markdown content data: %w", err)
 	}
 
-	//
-	//should add meta data of the file and create a new one
-	//
 	return err
 }
 

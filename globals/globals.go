@@ -34,12 +34,13 @@ type Response struct {
 
 // check if frontend can support object like syntax in markdown metaData
 type LanguageData struct {
-	Name  string `yaml:"name"`
-	Color string `yaml:"color"`
-	Size  int    `yaml:"size"`
+	Name  string  `yaml:"name"`
+	Color string  `yaml:"color"`
+	Size  float32 `yaml:"size"`
 }
 
 type RepoMetaData struct {
+	Title       string         `yaml:"title"`
 	Description string         `yaml:"description"`
 	Url         string         `yaml:"url"`
 	UpdatedAt   string         `yaml:"updatedAt"`

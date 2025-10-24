@@ -1,19 +1,20 @@
 ---
-description: "A nuxt portfolio and blog app with markdown parsing and code highlighting built using nuxt. This project is also deployed on nuxt hub : https://nuxt-portfolio-zidariu-sabin.nuxt.dev/ "
-url: https://github.com/zidariu-sabin/nuxt_portfolio
-updatedAt: "2025-10-21T19:53:29Z"
+title: Finance_tracker_iteration_0_dotnet_mvc
+description: ""
+url: https://github.com/zidariu-sabin/Finance_tracker_iteration_0_dotnet_mvc
+updatedAt: "2025-04-01T22:12:01Z"
 languages:
-- name: Vue
-  color: "#41b883"
-  size: 17440
+- name: "C#"
+  color: "#178600"
+  size: 17.2
+- name: HTML
+  color: "#e34c26"
+  size: 71.5
 - name: CSS
   color: "#663399"
-  size: 1213
-- name: TypeScript
-  color: "#3178c6"
-  size: 1628
+  size: 9.4
 - name: JavaScript
   color: "#f1e05a"
-  size: 162
-readMeOid: be8cb9e
+  size: 2.0
+readMeOid: 2c6f010
 ---

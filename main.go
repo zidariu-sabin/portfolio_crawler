@@ -11,6 +11,7 @@ import (
 	"os"
 	"portfolio_crawler/globals"
 	"portfolio_crawler/utils"
+	"strconv"
 
 	"github.com/joho/godotenv"
 )
@@ -22,7 +23,7 @@ func fetchRepos(user string, token string) (map[string]string, error) {
 
 	query := `query($login: String!){
 		user(login: $login) {
-			repositories(first: 4, orderBy: {field: UPDATED_AT, direction: DESC}) {
+			repositories(first: 100, orderBy: {field: UPDATED_AT, direction: DESC}) {
 				nodes {
 					name
 					description
@@ -87,17 +88,28 @@ func fetchRepos(user string, token string) (map[string]string, error) {
 		if repo.Object.AbreviatedOid == "" {
 			continue
 		}
-		langs := make([]globals.LanguageData, 0)
+		edges := repo.Languages.Edges
+		totalSize := float32(0)
+		for _, edge := range edges {
+			totalSize += float32(edge.Size)
+		}
 
-		for _, lang := range repo.Languages.Edges {
+		langs := make([]globals.LanguageData, 0)
+		for _, edge := range edges {
+			percentage, _ := strconv.ParseFloat(
+				fmt.Sprintf("%.1f", float32(edge.Size)/totalSize*100),
+				32,
+			)
+
 			langs = append(langs, globals.LanguageData{
-				Name:  lang.Node.Name,
-				Color: lang.Node.Color,
-				Size:  lang.Size,
+				Name:  edge.Node.Name,
+				Color: edge.Node.Color,
+				Size:  float32(percentage),
 			})
 		}
 
 		reposMetaData[repo.Name] = globals.RepoMetaData{
+			Title:       repo.Name,
 			Description: repo.Description,
 			Url:         repo.Url,
 			UpdatedAt:   repo.UpdatedAt,

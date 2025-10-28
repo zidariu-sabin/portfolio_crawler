@@ -42,6 +42,7 @@ type LanguageData struct {
 type RepoMetaData struct {
 	Title       string         `yaml:"title"`
 	Description string         `yaml:"description"`
+	Label       string         `yaml:"label"`
 	Url         string         `yaml:"url"`
 	UpdatedAt   string         `yaml:"updatedAt"`
 	Languages   []LanguageData `yaml:"languages"`

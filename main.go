@@ -11,12 +11,64 @@ import (
 	"os"
 	"portfolio_crawler/globals"
 	"portfolio_crawler/utils"
+	"sort"
 	"strconv"
 
 	"github.com/joho/godotenv"
 )
 
 const githubGraphQLEndpoint = "https://api.github.com/graphql"
+
+func extractDataFromResponse(user string, data *globals.Response) (*map[string]string, error) {
+	//return the rawgithubcontent api for the repos that have readMeFiles to download
+	var readMeFileLinks = make(map[string]string)
+	var reposMetaData = make(map[string]globals.RepoMetaData)
+	for _, repo := range data.Data.User.Repositories.Nodes {
+		if repo.Object.AbreviatedOid == "" {
+			continue
+		}
+		edges := repo.Languages.Edges
+		totalSize := float32(0)
+		for _, edge := range edges {
+			totalSize += float32(edge.Size)
+		}
+
+		langs := make([]globals.LanguageData, 0)
+		for _, edge := range edges {
+			percentage, _ := strconv.ParseFloat(
+				fmt.Sprintf("%.1f", float32(edge.Size)/totalSize*100),
+				32,
+			)
+
+			langs = append(langs, globals.LanguageData{
+				Name:  edge.Node.Name,
+				Color: edge.Node.Color,
+				Size:  float32(percentage),
+			})
+		}
+
+		sort.Slice(langs, func(i, j int) bool {
+			return langs[i].Size > langs[j].Size
+		})
+
+		reposMetaData[repo.Name] = globals.RepoMetaData{
+			Title:       repo.Name,
+			Description: repo.Description,
+			Label:       "building", // temporary hardcoded label
+			Url:         repo.Url,
+			UpdatedAt:   repo.UpdatedAt,
+			Languages:   langs,
+			ReadMeOid:   repo.Object.AbreviatedOid,
+		}
+
+		readMeFileLinks[repo.Name] = fmt.Sprintf("https://raw.githubusercontent.com/%v/%v/main/README.md", user, repo.Name)
+	}
+
+	globals.ReposData = data
+	globals.ReposMetaData = reposMetaData
+
+	return &readMeFileLinks, nil
+}
 
 func fetchRepos(user string, token string) (map[string]string, error) {
 	//create gql query to gather data on repository and load data from the resourcePath with /blob/
@@ -81,49 +133,13 @@ func fetchRepos(user string, token string) (map[string]string, error) {
 
 	}
 
-	//return the rawgithubcontent api for the repos that have readMeFiles to download
-	var readMeFileLinks = make(map[string]string)
-	var reposMetaData = make(map[string]globals.RepoMetaData)
-	for _, repo := range data.Data.User.Repositories.Nodes {
-		if repo.Object.AbreviatedOid == "" {
-			continue
-		}
-		edges := repo.Languages.Edges
-		totalSize := float32(0)
-		for _, edge := range edges {
-			totalSize += float32(edge.Size)
-		}
+	readMeFileLinks, err := extractDataFromResponse(user, &data)
 
-		langs := make([]globals.LanguageData, 0)
-		for _, edge := range edges {
-			percentage, _ := strconv.ParseFloat(
-				fmt.Sprintf("%.1f", float32(edge.Size)/totalSize*100),
-				32,
-			)
-
-			langs = append(langs, globals.LanguageData{
-				Name:  edge.Node.Name,
-				Color: edge.Node.Color,
-				Size:  float32(percentage),
-			})
-		}
-
-		reposMetaData[repo.Name] = globals.RepoMetaData{
-			Title:       repo.Name,
-			Description: repo.Description,
-			Url:         repo.Url,
-			UpdatedAt:   repo.UpdatedAt,
-			Languages:   langs,
-			ReadMeOid:   repo.Object.AbreviatedOid,
-		}
-
-		readMeFileLinks[repo.Name] = fmt.Sprintf("https://raw.githubusercontent.com/%v/%v/main/README.md", user, repo.Name)
+	if err != nil {
+		return nil, err
 	}
 
-	globals.ReposData = &data
-	globals.ReposMetaData = reposMetaData
-
-	return readMeFileLinks, nil
+	return *readMeFileLinks, nil
 }
 
 //execute shell script to download files to folder
@@ -131,12 +147,12 @@ func fetchRepos(user string, token string) (map[string]string, error) {
 func main() {
 	godotenv.Load(".env")
 	token := os.Getenv("GITHUB_AUTH_TOKEN")
-	username := os.Getenv("GITHUB_USERNAME")
+	user := os.Getenv("GITHUB_USERNAME")
 
 	if token == "" {
 		log.Fatal("Error: please provide a GitHub API token via env variable GITHUB_AUTH_TOKEN")
 	}
-	if username == "" {
+	if user == "" {
 		log.Fatal("Error: please provide a GitHub Username via env variable GITHUB_USERNAME")
 	}
 
@@ -148,7 +164,7 @@ func main() {
 	globals.DestinationDir = desiredDir
 	// globals.ReposMetaData = make(map[string]globals.RepoMetaData)
 
-	readMeFileLinks, err := fetchRepos(username, token)
+	readMeFileLinks, err := fetchRepos(user, token)
 
 	if err != nil {
 		log.Fatalf("Error: %v", err)

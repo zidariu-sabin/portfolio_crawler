@@ -1,21 +1,21 @@
 ---
-title: Finance_tracker_iteration_0_dotnet_mvc
+title: learn-file-storage-s3-golang-starter
 description: ""
 label: building
-url: https://github.com/zidariu-sabin/Finance_tracker_iteration_0_dotnet_mvc
-updatedAt: "2025-04-01T22:12:01Z"
+url: https://github.com/zidariu-sabin/learn-file-storage-s3-golang-starter
+updatedAt: "2025-10-05T16:36:18Z"
 languages:
-- name: HTML
-  color: "#e34c26"
-  size: 71.5
-- name: "C#"
-  color: "#178600"
-  size: 17.2
-- name: CSS
-  color: "#663399"
-  size: 9.4
+- name: Go
+  color: "#00ADD8"
+  size: 70.1
 - name: JavaScript
   color: "#f1e05a"
-  size: 2.0
-readMeOid: 2c6f010
+  size: 20.3
+- name: CSS
+  color: "#663399"
+  size: 7.8
+- name: Shell
+  color: "#89e051"
+  size: 1.7
+readMeOid: 34d955b
 ---

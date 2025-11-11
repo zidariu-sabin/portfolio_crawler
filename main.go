@@ -23,6 +23,7 @@ func extractDataFromResponse(user string, data *globals.Response) (*map[string]s
 	//return the rawgithubcontent api for the repos that have readMeFiles to download
 	var readMeFileLinks = make(map[string]string)
 	var reposMetaData = make(map[string]globals.RepoMetaData)
+	var rmts = make([]globals.RepoMetaData, 0)
 	for _, repo := range data.Data.User.Repositories.Nodes {
 		if repo.Object.AbreviatedOid == "" {
 			continue
@@ -51,7 +52,7 @@ func extractDataFromResponse(user string, data *globals.Response) (*map[string]s
 			return langs[i].Size > langs[j].Size
 		})
 
-		reposMetaData[repo.Name] = globals.RepoMetaData{
+		rmt := globals.RepoMetaData{
 			Title:       repo.Name,
 			Description: repo.Description,
 			Label:       "building", // temporary hardcoded label
@@ -61,7 +62,17 @@ func extractDataFromResponse(user string, data *globals.Response) (*map[string]s
 			ReadMeOid:   repo.Object.AbreviatedOid,
 		}
 
+		rmts = append(rmts, rmt)
+
+		reposMetaData[repo.Name] = rmt
+
 		readMeFileLinks[repo.Name] = fmt.Sprintf("https://raw.githubusercontent.com/%v/%v/main/README.md", user, repo.Name)
+	}
+
+	_, err := utils.GenerateJsonOfAllMetaData("reposMetaData.json", rmts)
+
+	if err != nil {
+		return nil, err
 	}
 
 	globals.ReposData = data
@@ -178,7 +189,7 @@ func main() {
 
 	utils.DownloadMany(readMeFileLinks, 3)
 
-	utils.WriteJson(reposJsonOutput)
+	utils.WriteJson("repos.json", reposJsonOutput)
 
 	if err != nil {
 		log.Fatalf("Error: %v", err)

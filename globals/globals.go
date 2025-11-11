@@ -40,13 +40,13 @@ type LanguageData struct {
 }
 
 type RepoMetaData struct {
-	Title       string         `yaml:"title"`
-	Description string         `yaml:"description"`
-	Label       string         `yaml:"label"`
-	Url         string         `yaml:"url"`
-	UpdatedAt   string         `yaml:"updatedAt"`
-	Languages   []LanguageData `yaml:"languages"`
-	ReadMeOid   string         `yaml:"readMeOid"`
+	Title       string         `json,yaml:"title"`
+	Description string         `json,yaml:"description"`
+	Label       string         `json,yaml:"label"`
+	Url         string         `json,yaml:"url"`
+	UpdatedAt   string         `json,yaml:"updatedAt"`
+	Languages   []LanguageData `json,yaml:"languages"`
+	ReadMeOid   string         `json,yaml:"readMeOid"`
 }
 
 var (

@@ -1,5 +1,7 @@
 .env
 repos.json
 repos.yaml
+repo.yaml
+reposMetaData.json
 test/
 samples/

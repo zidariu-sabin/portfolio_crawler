@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
@@ -54,7 +55,7 @@ func ValidateDest(dest string) (string, error) {
 }
 
 // parsing repo meta data to yaml format
-func GenerateMetaData(name string) ([]byte, error) {
+func GenerateYamlMetaData(name string) ([]byte, error) {
 	y := []byte("---\n")
 	metaDataYaml, err := yaml.Marshal(globals.ReposMetaData[name])
 
@@ -65,9 +66,22 @@ func GenerateMetaData(name string) ([]byte, error) {
 	y = append(y, metaDataYaml...)
 	y = append(y, []byte("---\n")...)
 
-	WriteYaml(y)
+	WriteYaml("repo.yaml", y)
 	return y, nil
 
+}
+
+func GenerateJsonOfAllMetaData(fileName string, rmts []globals.RepoMetaData) ([]byte, error) {
+
+	jsonReposMetaData, err := json.MarshalIndent(rmts, "", "  ")
+
+	if err != nil {
+		return nil, err
+	}
+
+	WriteJson(fileName, jsonReposMetaData)
+
+	return jsonReposMetaData, nil
 }
 
 func DownloadFile(url, newFilePath string, fileName string) error {
@@ -98,7 +112,7 @@ func DownloadFile(url, newFilePath string, fileName string) error {
 	defer out.Close()
 
 	//generating yaml meta data for the markdown file
-	metaData, err := GenerateMetaData(fileName)
+	metaData, err := GenerateYamlMetaData(fileName)
 	if err != nil {
 		return fmt.Errorf("creating meta data: %w", err)
 	}

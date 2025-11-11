@@ -5,8 +5,8 @@ import (
 )
 
 // creates a file repos.yaml and writes the output byte slice to it
-func WriteJson(reposJsonOutput []byte) error {
-	f, err := os.Create("repos.json")
+func WriteJson(fileName string, reposJsonOutput []byte) error {
+	f, err := os.Create(fileName)
 
 	if err != nil {
 		return err
@@ -23,8 +23,8 @@ func WriteJson(reposJsonOutput []byte) error {
 }
 
 // creates a file repos.yaml and writes the output byte slice to it
-func WriteYaml(output []byte) error {
-	f, err := os.Create("repos.yaml")
+func WriteYaml(fileName string, output []byte) error {
+	f, err := os.Create(fileName)
 
 	if err != nil {
 		return err

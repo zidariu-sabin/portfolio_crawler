@@ -17,11 +17,12 @@
 Create a .env file with the contents of the .env.example file.
 
 The github private access can be generated through the following steps:
-Go to GitHub.com > Settings > Developer Settings.
-Click “Personal access tokens” → Tokens (classic) or Fine-grained tokens.
-Click “Generate new token”
-Select the expiration date and scopes (e.g., repo, workflow, user, gist)
-Click Generate token.
+
+- Go to GitHub.com > Settings > Developer Settings.
+- Click “Personal access tokens” → Tokens (classic) or Fine-grained tokens.
+- Click “Generate new token”
+- Select the expiration date and scopes (e.g., repo, workflow, user, gist)
+- Click Generate token.
 
 With a [correctly configured](https://go.dev/doc/install#testing) Go toolchain, run:
 ```shell

@@ -40,4 +40,4 @@ together with :
 
 for debugging purposes.
 
-Checkout the [blogREADME](https://github.com/zidariu-sabin/portfolio_crawler/blob/main/blogREADME.md) section to see how i used the generated files to create a portfolio section.
+Checkout the [Implementation and Usage](https://github.com/zidariu-sabin/portfolio_crawler/blob/main/blogREADME.md) section to see how i used the generated files to create a portfolio section.

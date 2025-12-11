@@ -46,11 +46,12 @@ type RepoMetaData struct {
 	Url         string         `json,yaml:"url"`
 	UpdatedAt   string         `json,yaml:"updatedAt"`
 	Languages   []LanguageData `json,yaml:"languages"`
-	ReadMeOid   string         `json,yaml:"readMeOid"`
+	DocFileOid  string         `json,yaml:"docFileOid"`
 }
 
 var (
-	ReposData      *Response               //might end up deleting
-	ReposMetaData  map[string]RepoMetaData // map of repos with name as key
-	DestinationDir string
+	ReposData          *Response               //might end up deleting
+	ReposMetaData      map[string]RepoMetaData // map of repos with name as key
+	DestinationDir     string
+	JsonFileDesiredDir string
 )

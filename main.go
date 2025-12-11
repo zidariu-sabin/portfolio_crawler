@@ -19,9 +19,9 @@ import (
 
 const githubGraphQLEndpoint = "https://api.github.com/graphql"
 
-func extractDataFromResponse(user string, data *globals.Response) (*map[string]string, error) {
-	//return the rawgithubcontent api for the repos that have readMeFiles to download
-	var readMeFileLinks = make(map[string]string)
+func extractDataFromResponse(user string, docFile string, data *globals.Response) (*map[string]string, error) {
+	//return the rawgithubcontent api for the repos that have docFiles to download
+	var docFileLinks = make(map[string]string)
 	var reposMetaData = make(map[string]globals.RepoMetaData)
 	var rmts = make([]globals.RepoMetaData, 0)
 	for _, repo := range data.Data.User.Repositories.Nodes {
@@ -59,17 +59,17 @@ func extractDataFromResponse(user string, data *globals.Response) (*map[string]s
 			Url:         repo.Url,
 			UpdatedAt:   repo.UpdatedAt,
 			Languages:   langs,
-			ReadMeOid:   repo.Object.AbreviatedOid,
+			DocFileOid:  repo.Object.AbreviatedOid,
 		}
 
 		rmts = append(rmts, rmt)
 
 		reposMetaData[repo.Name] = rmt
 
-		readMeFileLinks[repo.Name] = fmt.Sprintf("https://raw.githubusercontent.com/%v/%v/main/README.md", user, repo.Name)
+		docFileLinks[repo.Name] = fmt.Sprintf("https://raw.githubusercontent.com/%v/%v/main/%s.md", user, repo.Name, docFile)
 	}
 
-	_, err := utils.GenerateJsonOfAllMetaData("reposMetaData.json", rmts)
+	_, err := utils.GenerateJsonOfAllMetaData(globals.JsonFileDesiredDir+"/reposMetaData.json", rmts)
 
 	if err != nil {
 		return nil, err
@@ -78,13 +78,13 @@ func extractDataFromResponse(user string, data *globals.Response) (*map[string]s
 	globals.ReposData = data
 	globals.ReposMetaData = reposMetaData
 
-	return &readMeFileLinks, nil
+	return &docFileLinks, nil
 }
 
-func fetchRepos(user string, token string) (map[string]string, error) {
+func fetchRepos(user string, token string, docFile string) (map[string]string, error) {
 	//create gql query to gather data on repository and load data from the resourcePath with /blob/
 
-	query := `query($login: String!){
+	query := fmt.Sprintf(`query($login: String!){
 		user(login: $login) {
 			repositories(first: 100, orderBy: {field: UPDATED_AT, direction: DESC}) {
 				nodes {
@@ -101,7 +101,7 @@ func fetchRepos(user string, token string) (map[string]string, error) {
 						size
 						}
 					}
-					object(expression: "main:README.md") {
+					object(expression: "main:%s.md") {
 						... on Blob {
 							abbreviatedOid
 						}
@@ -109,7 +109,7 @@ func fetchRepos(user string, token string) (map[string]string, error) {
 				}
 			}
 		}
-	}`
+	}`, docFile)
 
 	reqBody := globals.GraphQLRequest{
 		Query: query,
@@ -144,13 +144,13 @@ func fetchRepos(user string, token string) (map[string]string, error) {
 
 	}
 
-	readMeFileLinks, err := extractDataFromResponse(user, &data)
+	docFileLinks, err := extractDataFromResponse(user, docFile, &data)
 
 	if err != nil {
 		return nil, err
 	}
 
-	return *readMeFileLinks, nil
+	return *docFileLinks, nil
 }
 
 //execute shell script to download files to folder
@@ -159,6 +159,7 @@ func main() {
 	godotenv.Load(".env")
 	token := os.Getenv("GITHUB_AUTH_TOKEN")
 	user := os.Getenv("GITHUB_USERNAME")
+	docFile := os.Getenv("DOCUMENTATION_FILE_NAME")
 
 	if token == "" {
 		log.Fatal("Error: please provide a GitHub API token via env variable GITHUB_AUTH_TOKEN")
@@ -167,15 +168,23 @@ func main() {
 		log.Fatal("Error: please provide a GitHub Username via env variable GITHUB_USERNAME")
 	}
 
-	desiredDir, err := utils.ValidateDest(os.Getenv("DESTINATION_FOLDER_PATH"))
+	if docFile == "" {
+		log.Fatal("Error: please provide a docFile name to pull via env variable DOCUMENTATION_FILE_NAME")
+	}
+
+	mdFilesDesiredDir, err := utils.ValidateDest(os.Getenv("MARKDOWN_FILES_DESTINATION_FOLDER_PATH"))
+	if err != nil {
+		log.Fatalf("Error: %v", err)
+	}
+	jsonFileDesiredDir, err := utils.ValidateDest(os.Getenv("JSON_DESTINATION_FOLDER_PATH"))
 
 	if err != nil {
 		log.Fatalf("Error: %v", err)
 	}
-	globals.DestinationDir = desiredDir
-	// globals.ReposMetaData = make(map[string]globals.RepoMetaData)
+	globals.DestinationDir = mdFilesDesiredDir
+	globals.JsonFileDesiredDir = jsonFileDesiredDir
 
-	readMeFileLinks, err := fetchRepos(user, token)
+	docFileLinks, err := fetchRepos(user, token, docFile)
 
 	if err != nil {
 		log.Fatalf("Error: %v", err)
@@ -187,9 +196,9 @@ func main() {
 		log.Fatalf("Error: %v", err)
 	}
 
-	utils.DownloadMany(readMeFileLinks, 3)
+	utils.DownloadMany(docFileLinks, 3)
 
-	utils.WriteJson("repos.json", reposJsonOutput)
+	utils.WriteJson("/repos.json", reposJsonOutput)
 
 	if err != nil {
 		log.Fatalf("Error: %v", err)

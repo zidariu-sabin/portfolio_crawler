@@ -23,6 +23,8 @@ I have created a blogREADME.md file in each repository that i want to be display
 
 In this case, I set the env variable DOCUMENTATION_FILE_NAME to "blogREADME" in order to pull those files.
 
+An example using the key "README" to pull all the README files from my public repositories can be found in the [data_example directory](https://github.com/zidariu-sabin/portfolio_crawler/tree/main/data_example) to understand what the parsed data could look like.
+
 Feel Free to check out in detail how i used the files for my portfolio project:
 [Nuxt](https://github.com/zidariu-sabin/nuxt_portfolio), [Svelte](https://github.com/zidariu-sabin/portfolio_svelte)
  
